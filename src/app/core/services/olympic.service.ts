@@ -13,7 +13,8 @@ export class OlympicService {
   constructor(private http: HttpClient) {}
 
   loadInitialData() {
-    return this.http.get<any>(this.olympicUrl).pipe(
+    return this.http.get<any>(this.olympicUrl).pipe
+    (
       tap((value) => this.olympics$.next(value)),
       catchError((error, caught) => {
         // TODO: improve error handling
