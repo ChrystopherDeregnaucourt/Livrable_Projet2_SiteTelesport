@@ -7,3 +7,10 @@
 
 <!-- Boutton test vers une page inexistante -->
 <button routerLink="**">Go to not found</button>
+
+<!-- Liste des pays avec lien vers la page de détails -->
+<ul>
+  <li *ngFor="let olympic of (olympics$ | async)">
+    <a (click)="goToCountry(olympic.id)">{{ olympic.country }}</a>
+  </li>
+</ul>

@@ -11,7 +11,7 @@ const routes: Routes = [
   },
   {
     // Route paramétrée pour accéder aux détails d'un pays en fonction de son identifiant.
-    path: 'country',
+    path: 'country/:id',
     component: CountryDetailsComponent,
   },
   {
