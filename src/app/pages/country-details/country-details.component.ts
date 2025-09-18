@@ -19,12 +19,10 @@ interface CountryDetailsViewModel {
 
 
 @Component({
-  selector: 'app-country-details',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './country-details.component.html',
-  styleUrl: './country-details.component.scss'
-  
+    selector: 'app-country-details',
+    imports: [CommonModule],
+    templateUrl: './country-details.component.html',
+    styleUrl: './country-details.component.scss'
 })
 export class CountryDetailsComponent 
 {
