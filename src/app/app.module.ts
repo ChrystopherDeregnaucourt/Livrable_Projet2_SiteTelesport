@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { CountryDetailsComponent } from './pages/country-details/country-details.component';
+import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, NotFoundComponent],
@@ -13,7 +14,8 @@ import { CountryDetailsComponent } from './pages/country-details/country-details
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    CountryDetailsComponent
+    CountryDetailsComponent,
+    NgChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -1,16 +1,36 @@
-<h2>Olympic games app</h2>
-<hr />
-<p>{{ (olympics$ | async)?.length }} data loaded</p>
+<ng-container *ngIf="viewModel$ | async as vm; else loading">
+  <section class="dashboard">
+    <header class="dashboard__header">
+      <div>
+        <h1 class="dashboard__title">Medals per Country</h1>
+      </div>
+      <div class="dashboard__stats">
+        <div class="stat-card">
+          <span class="stat-card__label">Number of JOs</span>
+          <span class="stat-card__value">{{ vm.olympicsCount }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">Number of countries</span>
+          <span class="stat-card__value">{{ vm.countriesCount }}</span>
+        </div>
+      </div>
+    </header>
 
-<!-- bouton test vers la page de détails d'un pays -->
-<button routerLink="/country">Go to country details</button>
+    <div class="dashboard__chart">
+      <div class="chart-card">
+        <div class="chart-card__canvas">
+          <canvas
+            baseChart
+            [data]="vm.chartData"
+            type="pie"
+            [options]="pieChartOptions"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>
 
-<!-- Boutton test vers une page inexistante -->
-<button routerLink="**">Go to not found</button>
-
-<!-- Liste des pays avec lien vers la page de détails -->
-<ul>
-  <li *ngFor="let olympic of (olympics$ | async)">
-    <a (click)="goToCountry(olympic.id)">{{ olympic.country }}</a>
-  </li>
-</ul>
+<ng-template #loading>
+  <div class="loading">Loading olympic data…</div>
+</ng-template>
