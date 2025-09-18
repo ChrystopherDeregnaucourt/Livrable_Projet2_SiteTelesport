@@ -18,7 +18,7 @@ import {
     standalone: false
 })
 export class HomeComponent implements OnInit {
-  public olympics$: Observable<any> = of(null);
+  public olympics$: Observable<OlympicCountry[]> = of([]);
 
   public viewModel$: Observable<HomeViewModel> = of({
     countriesCount: 0,
@@ -77,14 +77,8 @@ export class HomeComponent implements OnInit {
           outerRadius,
         } = element.getProps(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], true);
 
-        const value = Number(dataset.data[index]);
-
-        if (!value) {
-          return;
-        }
-
         const angle = (startAngle + endAngle) / 2;
-        const radialGap = 18;
+        const radialGap = 0;
         const labelMargin = 32;
         const { left: chartLeft, right: chartRight } = chartArea;
         const startX = centerX + Math.cos(angle) * outerRadius;
@@ -101,19 +95,19 @@ export class HomeComponent implements OnInit {
         ctx.beginPath();
         ctx.moveTo(startX, startY);
         ctx.lineTo(middleX, middleY);
-        ctx.lineTo(endX, endY);
+        ctx.lineTo(endX - 215, endY);
         ctx.strokeStyle = '#94a3b8';
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 2;
         ctx.stroke();
 
-        const label = data.labels?.[index] ?? '';
-        const text = `${label}: ${value}`;
+        const label = data.labels?.[index] ?? 'Unknown';
+        const text = `${label}`;
 
-        ctx.font = "600 12px 'Poppins', 'Segoe UI', Arial, sans-serif";
+        ctx.font = "600 18px 'Poppins', 'Segoe UI', Arial, sans-serif";
         ctx.fillStyle = '#1f2937';
         ctx.textBaseline = 'middle';
         ctx.textAlign = isRightSide ? 'left' : 'right';
-        ctx.fillText(text, endX + (isRightSide ? 8 : -8), endY);
+        ctx.fillText(text, endX + (isRightSide ? -200 : 200), endY);
         ctx.restore();
       });
     },
@@ -128,7 +122,11 @@ export class HomeComponent implements OnInit {
   {
     Chart.register(ChartDataLabels, this.calloutLabelsPlugin);
 
-    this.olympics$ = this.olympicService.getOlympics();
+    this.olympics$ = this.olympicService.getOlympics().pipe
+    (
+      filter((olympics): olympics is OlympicCountry[] => olympics != null)
+    );
+
     this.viewModel$ = this.olympics$.pipe(
       filter((olympics): olympics is OlympicCountry[] => Array.isArray(olympics)),
       map((olympics) => {
