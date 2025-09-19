@@ -31,14 +31,15 @@ export class HomeComponent implements OnInit {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
+        display: false, // Activé par défaut pour les petits écrans
+        position: 'bottom',
         labels: {
           usePointStyle: true,
           color: '#1f2937',
-          padding: 20,
+          padding: 15,
           font: {
             family: '"Poppins", "Segoe UI", Arial, sans-serif',
-            size: 13,
+            size: 12,
             weight: 500,
           },
         },
@@ -68,6 +69,29 @@ export class HomeComponent implements OnInit {
         return;
       }
 
+      // Déterminer si on a assez d'espace pour les labels personnalisés
+      const minWidthForCustomLabels = 600; // Largeur minimale requise
+      const chartWidth = chartArea.width;
+      
+      // Si l'écran est trop petit, activer la légende classique et ne pas dessiner les labels personnalisés
+      if (chartWidth < minWidthForCustomLabels) 
+      {
+        // Activer la légende classique
+        if (chart.options.plugins?.legend) 
+        {
+          chart.options.plugins.legend.display = true;
+        }
+        return; // Ne pas dessiner les labels personnalisés
+      } 
+      else 
+      {
+        // Désactiver la légende classique pour les grands écrans
+        if (chart.options.plugins?.legend) 
+        {
+          chart.options.plugins.legend.display = false;
+        }
+      }
+
       meta.data.forEach((element, index) => {
         const {
           x: centerX,
@@ -81,6 +105,11 @@ export class HomeComponent implements OnInit {
         const radialGap = 0;
         const labelMargin = 32;
         const { left: chartLeft, right: chartRight } = chartArea;
+        
+        // Calcul de la longueur des lignes (plus conservateur)
+        const availableWidth = chartWidth / 2;
+        const maxLineLength = Math.max(50, Math.min(215, availableWidth - 150));
+        
         const startX = centerX + Math.cos(angle) * outerRadius;
         const startY = centerY + Math.sin(angle) * outerRadius;
         const middleX = centerX + Math.cos(angle) * (outerRadius + radialGap);
@@ -91,23 +120,35 @@ export class HomeComponent implements OnInit {
           : chartLeft - labelMargin;
         const endY = middleY;
 
+        // Dessiner les lignes uniquement pour les grands écrans
+        const lineEndX = isRightSide 
+          ? endX - maxLineLength 
+          : endX + maxLineLength;
+        
+        // Récupérer la couleur du quartier correspondant
+        const backgroundColors = dataset.backgroundColor as string[]; 
+        const segmentColor = backgroundColors?.[index] || '#94a3b8';
+        
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(startX, startY);
         ctx.lineTo(middleX, middleY);
-        ctx.lineTo(endX - 215, endY);
-        ctx.strokeStyle = '#94a3b8';
+        ctx.lineTo(lineEndX, endY);
+        ctx.strokeStyle = segmentColor; // Utiliser la couleur du quartier
         ctx.lineWidth = 2;
         ctx.stroke();
 
         const label = data.labels?.[index] ?? 'Unknown';
         const text = `${label}`;
 
-        ctx.font = "600 18px 'Poppins', 'Segoe UI', Arial, sans-serif";
+        ctx.font = "600 16px 'Poppins', 'Segoe UI', Arial, sans-serif";
         ctx.fillStyle = '#1f2937';
         ctx.textBaseline = 'middle';
         ctx.textAlign = isRightSide ? 'left' : 'right';
-        ctx.fillText(text, endX + (isRightSide ? -200 : 200), endY);
+        
+        // Position des labels
+        const labelOffset = maxLineLength - 15;
+        ctx.fillText(text, endX + (isRightSide ? -labelOffset : labelOffset), endY);
         ctx.restore();
       });
     },
