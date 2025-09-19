@@ -42,9 +42,10 @@ export class OlympicService
     );
   }
 
-  getOlympics() 
-  {
-    return this.olympics$.asObservable();
+  getOlympics(): Observable<OlympicCountry[]> {
+    return this.olympics$.pipe(
+      map((olympics) => olympics || []), // Remplace `null` ou `undefined` par un tableau vide
+    );
   }
 
   /**
@@ -67,4 +68,96 @@ export class OlympicService
       })
     );
   }
+
+  /**
+   * Prépare les données nécessaires pour le modèle de vue de la page d'accueil.
+   * Retourne un observable contenant les statistiques et les données pour le graphique.
+   */
+  getHomeViewModel(): Observable<
+  {
+    countriesCount: number;
+    olympicsCount: number;
+    chartData: 
+    {
+      labels: string[];
+      datasets: 
+      {
+        data: number[];
+        backgroundColor: string[];
+        borderColor: string;
+        borderWidth: number;
+        hoverOffset: number;
+      }[];
+    };
+  }> 
+  {
+    return this.getOlympics().pipe(
+      map((olympics) => {
+        // Si les données sont nulles ou non disponibles, retourner un modèle vide
+        if (!olympics) {
+          return {
+            countriesCount: 0, // Aucun pays
+            olympicsCount: 0, // Aucune participation
+            chartData: { labels: [], datasets: [] }, // Pas de données pour le graphique
+          };
+        }
+
+        // Calculer le nombre total de pays participants
+        const countriesCount = olympics.length;
+
+        // Calculer le nombre total de participations aux Jeux Olympiques
+        const olympicsCount = olympics.reduce(
+          (total, country) => total + country.participations.length,
+          0
+        );
+
+        // Extraire les noms des pays pour les utiliser comme labels dans le graphique
+        const chartLabels = olympics.map((country) => country.country);
+
+        // Calculer le nombre total de médailles pour chaque pays
+        const chartData = olympics.map((country) =>
+          country.participations.reduce(
+            (medalSum, participation) => medalSum + participation.medalsCount,
+            0
+          )
+        );
+
+        // Retourner les données formatées pour le graphique
+        return {
+          countriesCount, // Nombre de pays participants
+          olympicsCount, // Nombre total de participations
+          chartData: {
+            labels: chartLabels, // Labels pour le graphique (noms des pays)
+            datasets: [
+              {
+                data: chartData, // Données pour le graphique (nombre de médailles)
+                backgroundColor: chartLabels.map(() =>
+                  // Générer une couleur aléatoire pour chaque segment
+                  '#' + Math.floor(Math.random() * 16777215).toString(16)
+                ),
+                borderColor: '#ffffff', // Couleur de la bordure des segments
+                borderWidth: 2, // Épaisseur de la bordure
+                hoverOffset: 0, // CORRECTION : Désactiver le grossissement au survol
+              },
+            ],
+          },
+        };
+      })
+    );
+  }
+
+}
+
+interface OlympicParticipation {
+  id: number;
+  year: number;
+  city: string;
+  medalsCount: number;
+  athleteCount: number;
+}
+
+export interface OlympicCountry {
+  id: number;
+  country: string;
+  participations: OlympicParticipation[];
 }
