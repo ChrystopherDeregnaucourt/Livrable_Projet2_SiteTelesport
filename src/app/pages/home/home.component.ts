@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, Renderer2 } from '@angular/core';
 import { filter, map, Observable, of } from 'rxjs';
 import { OlympicService, OlympicCountry } from 'src/app/core/services/olympic.service';
 import { Router } from '@angular/router';
@@ -8,8 +8,8 @@ import {
   ChartData,
   Chart,
   Plugin,
-  TooltipItem,
 } from 'chart.js';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector: 'app-home',
@@ -105,7 +105,9 @@ export class HomeComponent implements OnInit
 
   constructor(
     private readonly olympicService: OlympicService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly renderer: Renderer2,
+    @Inject(DOCUMENT) private readonly document: Document
   ) {}
 
   ngOnInit(): void 
@@ -130,43 +132,19 @@ export class HomeComponent implements OnInit
     let tooltipEl = chart.canvas.parentNode?.querySelector('div.chartjs-tooltip') as HTMLElement;
 
     if (!tooltipEl) {
-      tooltipEl = document.createElement('div');
-      tooltipEl.classList.add('chartjs-tooltip');
-      tooltipEl.style.background = '#04838f';
-      tooltipEl.style.borderRadius = '8px';
-      tooltipEl.style.color = 'white';
-      tooltipEl.style.opacity = '0';
-      tooltipEl.style.pointerEvents = 'none';
-      tooltipEl.style.position = 'absolute';
-      tooltipEl.style.transition = 'all 0.1s ease';
-      tooltipEl.style.padding = '10px 15px';
-      tooltipEl.style.fontFamily = "'Poppins', 'Segoe UI', Arial, sans-serif";
-      tooltipEl.style.textAlign = 'center';
-      tooltipEl.style.fontSize = '18px';
-      tooltipEl.style.fontWeight = '400';
-      tooltipEl.style.minWidth = '120px';
-      tooltipEl.style.zIndex = '1000';
-      
-      // Ajouter une petite flèche pointant vers le bas
-      const arrow = document.createElement('div');
-      arrow.style.position = 'absolute';
-      arrow.style.bottom = '-5px';
-      arrow.style.left = '50%';
-      arrow.style.transform = 'translateX(-50%)';
-      arrow.style.width = '0';
-      arrow.style.height = '0';
-      arrow.style.borderLeft = '10px solid transparent';
-      arrow.style.borderRight = '10px solid transparent';
-      arrow.style.borderTop = '10px solid #04838f';
-      arrow.classList.add('tooltip-arrow');
-      tooltipEl.appendChild(arrow);
+      tooltipEl = this.renderer.createElement('div');
+      this.renderer.addClass(tooltipEl, 'chartjs-tooltip');
+      this.applyTooltipBaseStyles(tooltipEl);
 
-      chart.canvas.parentNode?.appendChild(tooltipEl);
+      const parentNode = chart.canvas.parentNode as HTMLElement | null;
+      if (parentNode) {
+        this.renderer.appendChild(parentNode, tooltipEl);
+      }
     }
 
     // Masquer le tooltip si l'opacité est 0
     if (tooltip.opacity === 0) {
-      tooltipEl.style.opacity = '0';
+      this.renderer.setStyle(tooltipEl, 'opacity', '0');
       return;
     }
 
@@ -174,62 +152,111 @@ export class HomeComponent implements OnInit
     if (tooltip.body) {
       const titleLines = tooltip.title || [];
       const bodyLines = tooltip.body.map((b: any) => b.lines);
-
-      let innerHtml = '';
-
-      // Ajouter le titre (nom du pays)
-      titleLines.forEach((title: string) => {
-        innerHtml += `<div style="font-weight: 600; font-size: 18px; margin-bottom: 5px;">${title}</div>`;
-      });
-
-      // Ajouter le contenu avec l'icône de médaille
-      bodyLines.forEach((body: string[], i: number) => {
-        const value = body[0];
-        innerHtml += `
-          <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-            <img src="assets/images/medal.png" alt="médaille" style="width: 20px; height: 25px;" />
-            <span>${value}</span>
-          </div>
-        `;
-      });
-
-      // Sauvegarder la flèche avant de vider le contenu
-      const existingArrow = tooltipEl.querySelector('.tooltip-arrow');
-      tooltipEl.innerHTML = innerHtml;
-      
-      // Remettre la flèche
-      if (existingArrow) 
-      {
-        tooltipEl.appendChild(existingArrow);
-      } 
-      else 
-      {
-        const arrow = document.createElement('div');
-        arrow.classList.add('tooltip-arrow');
-        tooltipEl.appendChild(arrow);
-      }
+      this.updateTooltipContent(tooltipEl, titleLines, bodyLines);
     }
 
     // CORRECTION : Utiliser les vraies coordonnées de la souris
     const canvasRect = chart.canvas.getBoundingClientRect();
-    
+
     // Calculer la position relative à la fenêtre
-    const tooltipX = canvasRect.left + tooltip.caretX + window.scrollX;
-    const tooltipY = canvasRect.top + tooltip.caretY + window.scrollY - tooltipEl.offsetHeight - 10;
-    
+    const defaultView = this.document.defaultView;
+    const scrollX = defaultView?.scrollX ?? 0;
+    const scrollY = defaultView?.scrollY ?? 0;
+    const tooltipX = canvasRect.left + tooltip.caretX + scrollX;
+    const tooltipY = canvasRect.top + tooltip.caretY + scrollY - tooltipEl.offsetHeight - 10;
+
     // Appliquer la position
-    tooltipEl.style.opacity = '1';
-    tooltipEl.style.left = tooltipX + 'px';
-    tooltipEl.style.top = tooltipY + 'px';
-    tooltipEl.style.transform = 'translateX(-50%)'; // Centrer horizontalement seulement
+    this.renderer.setStyle(tooltipEl, 'opacity', '1');
+    this.renderer.setStyle(tooltipEl, 'left', `${tooltipX}px`);
+    this.renderer.setStyle(tooltipEl, 'top', `${tooltipY}px`);
+    this.renderer.setStyle(tooltipEl, 'transform', 'translateX(-50%)');
   }
 
-  public goToCountry(countryId: number): void 
+  public goToCountry(countryId: number): void
   {
     this.router.navigate(['/country', countryId]);
   }
 
-  private readonly calloutLabelsPlugin: Plugin<'pie'> = 
+  private applyTooltipBaseStyles(tooltipEl: HTMLElement): void
+  {
+    this.renderer.setStyle(tooltipEl, 'background', '#04838f');
+    this.renderer.setStyle(tooltipEl, 'borderRadius', '8px');
+    this.renderer.setStyle(tooltipEl, 'color', 'white');
+    this.renderer.setStyle(tooltipEl, 'opacity', '0');
+    this.renderer.setStyle(tooltipEl, 'pointerEvents', 'none');
+    this.renderer.setStyle(tooltipEl, 'position', 'absolute');
+    this.renderer.setStyle(tooltipEl, 'transition', 'all 0.1s ease');
+    this.renderer.setStyle(tooltipEl, 'padding', '10px 15px');
+    this.renderer.setStyle(tooltipEl, 'fontFamily', "'Poppins', 'Segoe UI', Arial, sans-serif");
+    this.renderer.setStyle(tooltipEl, 'textAlign', 'center');
+    this.renderer.setStyle(tooltipEl, 'fontSize', '18px');
+    this.renderer.setStyle(tooltipEl, 'fontWeight', '400');
+    this.renderer.setStyle(tooltipEl, 'minWidth', '120px');
+    this.renderer.setStyle(tooltipEl, 'zIndex', '1000');
+  }
+
+  private updateTooltipContent(
+    tooltipEl: HTMLElement,
+    titleLines: string[],
+    bodyLines: string[][]
+  ): void {
+    while (tooltipEl.firstChild) {
+      this.renderer.removeChild(tooltipEl, tooltipEl.firstChild);
+    }
+
+    titleLines.forEach((title: string) => {
+      const titleContainer = this.renderer.createElement('div');
+      this.renderer.setStyle(titleContainer, 'fontWeight', '600');
+      this.renderer.setStyle(titleContainer, 'fontSize', '18px');
+      this.renderer.setStyle(titleContainer, 'marginBottom', '5px');
+
+      const titleText = this.renderer.createText(title);
+      this.renderer.appendChild(titleContainer, titleText);
+      this.renderer.appendChild(tooltipEl, titleContainer);
+    });
+
+    bodyLines.forEach((body: string[]) => {
+      if (!body.length) {
+        return;
+      }
+
+      const row = this.renderer.createElement('div');
+      this.renderer.setStyle(row, 'display', 'flex');
+      this.renderer.setStyle(row, 'alignItems', 'center');
+      this.renderer.setStyle(row, 'justifyContent', 'center');
+      this.renderer.setStyle(row, 'gap', '5px');
+
+      const medalIcon = this.renderer.createElement('img');
+      this.renderer.setAttribute(medalIcon, 'src', 'assets/images/medal.png');
+      this.renderer.setAttribute(medalIcon, 'alt', 'médaille');
+      this.renderer.setStyle(medalIcon, 'width', '20px');
+      this.renderer.setStyle(medalIcon, 'height', '25px');
+
+      const valueSpan = this.renderer.createElement('span');
+      const valueText = this.renderer.createText(body[0]);
+      this.renderer.appendChild(valueSpan, valueText);
+
+      this.renderer.appendChild(row, medalIcon);
+      this.renderer.appendChild(row, valueSpan);
+      this.renderer.appendChild(tooltipEl, row);
+    });
+
+    const arrow = this.renderer.createElement('div');
+    this.renderer.addClass(arrow, 'tooltip-arrow');
+    this.renderer.setStyle(arrow, 'position', 'absolute');
+    this.renderer.setStyle(arrow, 'bottom', '-5px');
+    this.renderer.setStyle(arrow, 'left', '50%');
+    this.renderer.setStyle(arrow, 'transform', 'translateX(-50%)');
+    this.renderer.setStyle(arrow, 'width', '0');
+    this.renderer.setStyle(arrow, 'height', '0');
+    this.renderer.setStyle(arrow, 'borderLeft', '10px solid transparent');
+    this.renderer.setStyle(arrow, 'borderRight', '10px solid transparent');
+    this.renderer.setStyle(arrow, 'borderTop', '10px solid #04838f');
+
+    this.renderer.appendChild(tooltipEl, arrow);
+  }
+
+  private readonly calloutLabelsPlugin: Plugin<'pie'> =
   {
     id: 'pieCalloutLabels',
     afterDatasetsDraw: (chart) => {
