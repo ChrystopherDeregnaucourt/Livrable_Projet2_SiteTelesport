@@ -146,6 +146,96 @@ export class OlympicService
     );
   }
 
+  /**
+   * Prépare les données nécessaires pour le modèle de vue de la page de détails d'un pays.
+   * Retourne un observable contenant les informations du pays et les données pour le graphique linéaire.
+   */
+  getCountryDetailsViewModel(countryId: number): Observable<{
+    status: 'loading' | 'ready' | 'not-found' | 'error';
+    countryName: string;
+    metrics: { entries: number; medals: number; athletes: number };
+    chartData: any;
+  }> {
+    return this.olympics$.pipe(
+      map((olympics) => {
+        // Si les données sont undefined (en cours de chargement)
+        if (olympics === undefined) {
+          return {
+            status: 'loading' as const,
+            countryName: '',
+            metrics: { entries: 0, medals: 0, athletes: 0 },
+            chartData: { labels: [], datasets: [] }
+          };
+        }
+
+        // Si les données sont null (erreur de chargement)
+        if (olympics === null) {
+          return {
+            status: 'error' as const,
+            countryName: '',
+            metrics: { entries: 0, medals: 0, athletes: 0 },
+            chartData: { labels: [], datasets: [] }
+          };
+        }
+
+        // Rechercher le pays correspondant à l'ID
+        const country = olympics.find((olympic) => olympic.id === countryId);
+
+        // Si le pays n'est pas trouvé
+        if (!country) {
+          return {
+            status: 'not-found' as const,
+            countryName: '',
+            metrics: { entries: 0, medals: 0, athletes: 0 },
+            chartData: { labels: [], datasets: [] }
+          };
+        }
+
+        // Trier les participations par année
+        const participations = [...country.participations].sort(
+          (a, b) => a.year - b.year
+        );
+
+        // Préparer les données pour le graphique linéaire
+        const chartData = {
+          labels: participations.map((participation) => participation.year.toString()),
+          datasets: [
+            {
+              data: participations.map((participation) => participation.medalsCount),
+              label: 'Médailles',
+              borderColor: '#2563EB',
+              pointRadius: 0,
+              tension: 0, // CORRECTION : Mettre à 0 pour avoir des lignes droites
+              fill: false,
+            },
+          ],
+        };
+
+        // Calculer les métriques
+        const medals = participations.reduce(
+          (total, participation) => total + participation.medalsCount,
+          0
+        );
+        const athletes = participations.reduce(
+          (total, participation) => total + participation.athleteCount,
+          0
+        );
+
+        // Retourner les données complètes
+        return {
+          status: 'ready' as const,
+          countryName: country.country,
+          metrics: {
+            entries: participations.length,
+            medals,
+            athletes,
+          },
+          chartData,
+        };
+      })
+    );
+  }
+
 }
 
 interface OlympicParticipation {

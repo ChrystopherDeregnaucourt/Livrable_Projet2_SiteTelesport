@@ -35,7 +35,7 @@ export class CountryDetailsComponent implements OnInit {
 
   public lineChartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: true,
     layout: {
       padding: {
         top: 20, // Ajouter un padding en haut pour éviter que la courbe soit coupée
@@ -49,7 +49,7 @@ export class CountryDetailsComponent implements OnInit {
         display: false,
       },
       datalabels: {
-        display: false, // AJOUT : Désactiver explicitement le plugin ChartDataLabels
+        display: false,
       },
       tooltip: {
         enabled: true,
@@ -59,8 +59,7 @@ export class CountryDetailsComponent implements OnInit {
         displayColors: false, // Ne pas afficher la boîte de couleur
         callbacks: {
           label: (context) => {
-            // Afficher seulement la valeur sans le nom du dataset
-            return `${context.parsed.y} médailles`;
+            return `${context.parsed.y} medals`;
           },
           title: (tooltipItems) => {
             // Afficher seulement l'année
@@ -112,6 +111,7 @@ export class CountryDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Simplification : utiliser la nouvelle méthode du service
     this.viewModel$ = this.route.paramMap.pipe(
       map((params) => {
         const rawId = params.get('id');
@@ -132,67 +132,8 @@ export class CountryDetailsComponent implements OnInit {
           });
         }
 
-        return this.olympicService.getOlympics().pipe(
-          map((olympics) => {
-            if (olympics === null) {
-              return {
-                status: 'error',
-                countryName: '',
-                metrics: { entries: 0, medals: 0, athletes: 0 },
-                chartData: this.emptyLineChartData
-              };
-            }
-
-            const country = olympics.find((olympic) => olympic.id === countryId);
-
-            if (!country) {
-              return {
-                status: 'not-found',
-                countryName: '',
-                metrics: { entries: 0, medals: 0, athletes: 0 },
-                chartData: this.emptyLineChartData
-              };
-            }
-
-            const participations: Participation[] = [...country.participations].sort(
-              (a, b) => a.year - b.year
-            );
-
-            const chartData: ChartConfiguration<'line'>['data'] = {
-              labels: participations.map((participation) => participation.year.toString()),
-              datasets: [
-                {
-                  data: participations.map((participation) => participation.medalsCount),
-                  label: 'Dates',
-                  borderColor: '#2563EB',
-                  pointRadius: 0,
-                  tension: 0.35,
-                  fill: false,
-                },
-              ],
-            };
-
-            const medals = participations.reduce(
-              (total, participation) => total + participation.medalsCount,
-              0
-            );
-            const athletes = participations.reduce(
-              (total, participation) => total + participation.athleteCount,
-              0
-            );
-
-            return {
-              status: 'ready',
-              countryName: country.country,
-              metrics: {
-                entries: participations.length,
-                medals,
-                athletes,
-              },
-              chartData,
-            };
-          })
-        );
+        // Déléguer toute la logique au service
+        return this.olympicService.getCountryDetailsViewModel(countryId);
       })
     );
   }

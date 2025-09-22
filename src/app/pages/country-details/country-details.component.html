@@ -1,60 +1,65 @@
-<section class="details" *ngIf="viewModel$ | async as view">
-  <ng-container [ngSwitch]="view.status">
-    <p class="state-message" *ngSwitchCase="'loading'" aria-live="polite">
-      Loading country data...
-    </p>
+@if (viewModel$ | async; as view) {
+  <section class="details">
+    @switch (view.status) {
+      @case ('loading') {
+        <p class="state-message" aria-live="polite">
+          Loading country data...
+        </p>
+      }
 
-    <p
-      class="state-message state-message--error"
-      *ngSwitchCase="'error'"
-      role="alert"
-    >
-      We were unable to load the information for this country. Please try again
-      later.
-    </p>
+      @case ('error') {
+        <p class="state-message state-message--error" role="alert">
+          We were unable to load the information for this country. Please try again
+          later.
+        </p>
+      }
 
-    <div class="state-message" *ngSwitchCase="'not-found'">
-      <p class="state-message__title">Country not found</p>
-      <p class="state-message__body">
-        The requested country does not exist in our records.
-      </p>
-      <a class="link" routerLink="/">Back to dashboard</a>
-    </div>
-
-    <div *ngSwitchCase="'ready'" class="details__card" aria-live="polite">
-      <div class="details__top-bar">
-        <button type="button" class="back-button" routerLink="/">
-          ← Back
-        </button>
-      </div>
-
-      <header class="details__header">
-        <h1 class="details__title">{{ view.countryName }}</h1>
-        <div class="details__metrics" aria-label="Country statistics">
-          <article class="metric">
-            <span class="metric__label">Number of entries</span>
-            <span class="metric__value">{{ view.metrics.entries }}</span>
-          </article>
-          <article class="metric">
-            <span class="metric__label">Total number medals</span>
-            <span class="metric__value">{{ view.metrics.medals }}</span>
-          </article>
-          <article class="metric">
-            <span class="metric__label">Total number of athletes</span>
-            <span class="metric__value">{{ view.metrics.athletes }}</span>
-          </article>
+      @case ('not-found') {
+        <div class="state-message">
+          <p class="state-message__title">Country not found</p>
+          <p class="state-message__body">
+            The requested country does not exist in our records.
+          </p>
+          <a class="link" routerLink="/">Back to dashboard</a>
         </div>
-      </header>
+      }
 
-      <div class="details__chart">
-        <canvas
-          baseChart
-          aria-label="Line chart showing the total medals obtained over time"
-          [type]="'line'"
-          [data]="view.chartData"
-          [options]="lineChartOptions"
-        ></canvas>
-      </div>
-    </div>
-  </ng-container>
-</section>
+      @case ('ready') {
+        <div class="details__card" aria-live="polite">
+          <div class="details__top-bar">
+            <button type="button" class="back-button" routerLink="/">
+              ← Back
+            </button>
+          </div>
+
+          <header class="details__header">
+            <h1 class="details__title">{{ view.countryName }}</h1>
+            <div class="details__metrics">
+              <article class="metric">
+                <span class="metric__label">Number of entries</span>
+                <span class="metric__value">{{ view.metrics.entries }}</span>
+              </article>
+              <article class="metric">
+                <span class="metric__label">Total number medals</span>
+                <span class="metric__value">{{ view.metrics.medals }}</span>
+              </article>
+              <article class="metric">
+                <span class="metric__label">Total number of athletes</span>
+                <span class="metric__value">{{ view.metrics.athletes }}</span>
+              </article>
+            </div>
+          </header>
+
+          <div class="details__chart">
+            <canvas
+              baseChart
+              [type]="'line'"
+              [data]="view.chartData"
+              [options]="lineChartOptions"
+            ></canvas>
+          </div>
+        </div>
+      }
+    }
+  </section>
+}

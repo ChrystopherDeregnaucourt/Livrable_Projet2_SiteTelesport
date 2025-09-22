@@ -31,6 +31,13 @@ export class HomeComponent implements OnInit
   {
     responsive: true,
     maintainAspectRatio: false,
+    onResize: (chart, size) => {
+      // Gérer l'affichage de la légende selon la taille
+      const minWidthForCustomLabels = 600;
+      if (chart.options.plugins?.legend) {
+        chart.options.plugins.legend.display = size.width < minWidthForCustomLabels;
+      }
+    },
     onClick: (event, elements) => {
       // Vérifier qu'un élément a été cliqué
       if (elements.length > 0) {
@@ -235,28 +242,16 @@ export class HomeComponent implements OnInit
       }
 
       // Déterminer si on a assez d'espace pour les labels personnalisés
-      const minWidthForCustomLabels = 600; // Largeur minimale requise
+      const minWidthForCustomLabels = 600;
       const chartWidth = chartArea.width;
       
-      // Si l'écran est trop petit, activer la légende classique et ne pas dessiner les labels personnalisés
-      if (chartWidth < minWidthForCustomLabels) 
-      {
-        // Activer la légende classique
-        if (chart.options.plugins?.legend) 
-        {
-          chart.options.plugins.legend.display = true;
-        }
-        return; // Ne pas dessiner les labels personnalisés
-      } 
-      else 
-      {
-        // Désactiver la légende classique pour les grands écrans
-        if (chart.options.plugins?.legend) 
-        {
-          chart.options.plugins.legend.display = false;
-        }
+      // CORRECTION : Supprimer l'appel à chart.update() pour éviter la boucle infinie
+      // Si l'écran est trop petit, ne pas dessiner les labels personnalisés
+      if (chartWidth < minWidthForCustomLabels) {
+        return; // Sortir sans dessiner les labels personnalisés
       }
 
+      // Dessiner les labels personnalisés seulement pour les grands écrans
       meta.data.forEach((element, index) => {
         const {
           x: centerX,
@@ -271,7 +266,7 @@ export class HomeComponent implements OnInit
         const labelMargin = 32;
         const { left: chartLeft, right: chartRight } = chartArea;
         
-        // Calcul de la longueur des lignes (plus conservateur)
+        // Calcul de la longueur des lignes
         const availableWidth = chartWidth / 2;
         const maxLineLength = Math.max(50, Math.min(215, availableWidth - 150));
         
@@ -285,7 +280,6 @@ export class HomeComponent implements OnInit
           : chartLeft - labelMargin;
         const endY = middleY;
 
-        // Dessiner les lignes uniquement pour les grands écrans
         const lineEndX = isRightSide 
           ? endX - maxLineLength 
           : endX + maxLineLength;
@@ -299,7 +293,7 @@ export class HomeComponent implements OnInit
         ctx.moveTo(startX, startY);
         ctx.lineTo(middleX, middleY);
         ctx.lineTo(lineEndX, endY);
-        ctx.strokeStyle = segmentColor; // Utiliser la couleur du quartier
+        ctx.strokeStyle = segmentColor;
         ctx.lineWidth = 2;
         ctx.stroke();
 
