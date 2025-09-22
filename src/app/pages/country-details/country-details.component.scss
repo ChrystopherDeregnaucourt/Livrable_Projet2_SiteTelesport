@@ -1,0 +1,152 @@
+:host {
+  display: block;
+  padding: 2.5rem 1.5rem 3rem;
+}
+
+.details {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.details__card {
+  background: #ffffff;
+  padding: 2rem 1.75rem 2.5rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.details__top-bar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.back-button {
+  appearance: none;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover,
+.back-button:focus-visible {
+  background-color: rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+.details__header {
+  display: grid;
+  justify-items: center;
+  gap: 1.5rem;
+}
+
+.details__title {
+  margin: 0;
+  padding: 0.5rem 1.25rem;
+  font-size: clamp(1.5rem, 2.3vw, 2.25rem);
+  text-align: center;
+  font-weight: 200;
+  width: fit-content;
+  color: white;
+  background-color: #04838f;
+  border-radius: 0.75rem;
+}
+
+.details__metrics {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap; // Permettre le retour à la ligne sur petits écrans
+}
+
+.metric {
+  background: white;
+  border-radius: 18px;
+  border-color: #04838f;
+  box-sizing: border-box;
+  border-style: solid;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content; // S'adapter à la largeur du contenu
+}
+
+.metric__label {
+  font-size: 0.9rem; // Réduire légèrement la taille de police
+  letter-spacing: 0.05em;
+  color: #64748b;
+  white-space: nowrap; // Empêcher le retour à la ligne du texte
+  text-align: center; // Centrer le texte
+}
+
+.metric__value {
+  font-size: clamp(1.8rem, 1rem + 1.5vw, 2.5rem);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.details__chart {
+  position: relative;
+  min-height: 360px;
+  padding: 2rem 1rem; // Augmenter le padding pour éviter la coupure
+}
+
+.state-message {
+  max-width: 720px;
+  margin: 4rem auto 0;
+  padding: 1.5rem 2rem;
+  border-radius: 18px;
+  background: #f1f5f9;
+  color: #0f172a;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.state-message--error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.state-message__title {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.state-message__body {
+  margin: 0 0 1rem;
+  color: #475569;
+}
+
+.link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover,
+.link:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  :host {
+    padding: 3rem;
+  }
+
+  .details__card {
+    padding: 3rem 3.5rem;
+  }
+}
