@@ -1,17 +1,18 @@
-<ng-container *ngIf="viewModel$ | async as vm; else loading">
+@if (viewModel$ | async; as view)
+{
   <section class="dashboard">
     <header class="dashboard__header">
       <div>
-        <h1 class="dashboard__title">Medals per Country</h1>
+        <h1 class="page-title">Medals per Country</h1>
       </div>
       <div class="dashboard__stats">
         <div class="stat-card">
           <span class="stat-card__label">Number of JOs</span>
-          <span class="stat-card__value">{{ vm.olympicsCount }}</span>
+          <span class="stat-card__value">{{ view.olympicsCount }}</span>
         </div>
         <div class="stat-card">
           <span class="stat-card__label">Number of countries</span>
-          <span class="stat-card__value">{{ vm.countriesCount }}</span>
+          <span class="stat-card__value">{{ view.countriesCount }}</span>
         </div>
       </div>
     </header>
@@ -21,7 +22,7 @@
         <div >
           <canvas
             baseChart
-            [data]="vm.chartData"
+            [data]="view.chartData"
             type="pie"
             [options]="pieChartOptions"
           ></canvas>
@@ -29,8 +30,8 @@
       </div>
     </div>
   </section>
-</ng-container>
-
-<ng-template #loading>
+}
+@else
+{
   <div class="loading">Loading olympic data…</div>
-</ng-template>
+}

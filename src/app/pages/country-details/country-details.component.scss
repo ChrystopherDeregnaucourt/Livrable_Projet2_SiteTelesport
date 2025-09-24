@@ -1,20 +1,10 @@
 :host {
   display: block;
-  padding: 2.5rem 1.5rem 3rem;
-}
-
-.details {
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-.details__card {
-  background: #ffffff;
-  padding: 2rem 1.75rem 2.5rem;
-  display: grid;
-  gap: 2rem;
-  min-width: 0;
-  min-height: 0;
+  min-height: 100%;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: linear-gradient(135deg, #f4f7ff 0%, #ffffff 60%);
+  color: #1f2937;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .details__top-bar {
@@ -44,66 +34,13 @@
   outline: none;
 }
 
-.details__header {
-  display: grid;
-  justify-items: center;
-  gap: 1.5rem;
-  min-width: 0;
-  min-height: 0;
-}
-
-.details__title {
-  margin: 0;
-  padding: 0.5rem 1.25rem;
-  font-size: clamp(1.5rem, 2.3vw, 2.25rem);
-  text-align: center;
-  font-weight: 200;
-  width: fit-content;
-  color: white;
-  background-color: #04838f;
-  border-radius: 0.75rem;
-}
-
-.details__metrics {
-  display: flex;
-  gap: 1rem;
+// Override des styles globaux pour dashboard__stats sur cette page
+.dashboard__stats {
+  gap: 1.5rem !important; // Réduire l'espacement entre les cartes
   justify-content: center;
-  align-items: center; // Ajouter pour centrer verticalement
-  flex-wrap: wrap; // Permettre le retour à la ligne sur petits écrans
-  width: 100%; // S'assurer que le conteneur prend toute la largeur
-  min-width: 0;
-  min-height: 0;
-}
-
-.metric {
-  background: white;
-  border-radius: 18px;
-  border-color: #04838f;
-  box-sizing: border-box;
-  border-style: solid;
-  border-width: 2px; // Spécifier l'épaisseur de la bordure
-  padding: 1rem 1.5rem;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: fit-content; // S'adapter à la largeur du contenu
-  min-width: 140px; // Ajouter une largeur minimale pour la cohérence
-}
-
-.metric__label {
-  font-size: 0.9rem; // Réduire légèrement la taille de police
-  letter-spacing: 0.05em;
-  color: #64748b;
-  white-space: nowrap; // Empêcher le retour à la ligne du texte
-  text-align: center; // Centrer le texte
-}
-
-.metric__value {
-  font-size: clamp(1.8rem, 1rem + 1.5vw, 2.5rem);
-  font-weight: 700;
-  color: #0f172a;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .details__chart {
@@ -157,17 +94,6 @@
   :host {
     padding: 3rem;
   }
-
-  .details__card {
-    padding: 3rem 3.5rem;
-  }
 }
 
-@media (max-width: 720px) {
-  .stat-card {
-    width: 100%;
-    min-width: unset;
-    text-align: center;
-  }
-}
 

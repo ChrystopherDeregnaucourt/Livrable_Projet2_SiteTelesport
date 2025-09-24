@@ -9,10 +9,16 @@ import { Olympic } from '../models/Olympic';
   providedIn: 'root',
 })
 
-export class OlympicService 
+// Service maison : il encapsule la récupération des données mockées et expose
+// plusieurs ViewModels prêts à consommer côté composants
+export class OlympicService
 {
   private olympicUrl = './assets/mock/olympic.json';
 
+  // Je m'appuie sur un BehaviorSubject pour mémoriser la requête passée (pas de requêtes multiples) :
+  //   - `undefined` : chargement en cours
+  //   - `null`      : échec du chargement
+  //   - `Olympic[]` : données prêtes à l'emploi
   private olympics$ = new BehaviorSubject<Olympic[] | null | undefined>
   (
     undefined
@@ -20,31 +26,30 @@ export class OlympicService
 
   constructor(private http: HttpClient) {}
 
-   /**
-   * Déclenche une récupération des données olympiques et stocke le résultat
-   * dans le BehaviourSubject, tout en exposant l'observable à l'appelant.
-   */
   loadInitialData(): Observable<Olympic[] | null> 
   {
     return this.http.get<Olympic[]>(this.olympicUrl).pipe
     (
       tap((value) => this.olympics$.next(value)),
 
-      catchError((error) => 
+      catchError((error) =>
       {
-        // Journalisation simple pour diagnostiquer l'échec de la requête.
+        // log simple pour diagnostiquer l'échec de la requête.
         console.error(error);
 
-        // On publie `null` afin que les composants sortent de l'état de chargement.
+        // On publie `null` afin que les composants sortent de l'état de chargement pour passer en
+        // état d'erreur.
         this.olympics$.next(null);
         return of(null);
       })
     );
   }
 
-  getOlympics(): Observable<OlympicCountry[]> {
+  getOlympics(): Observable<OlympicCountry[]> 
+  {
+    //Si les données existent, on les retourne, sinon on retourne un tableau vide
     return this.olympics$.pipe(
-      map((olympics) => olympics || []), // Remplace `null` ou `undefined` par un tableau vide
+      map((olympics) => olympics || []), 
     );
   }
 
@@ -58,12 +63,14 @@ export class OlympicService
   getOlympicById(id: number): Observable<Olympic | undefined | null> 
   {
     return this.olympics$.pipe(
-      map((olympics) => {
-        if (!olympics || olympics === null) {
+      map((olympics) => 
+      {
+        if (!olympics || olympics === null) 
+        {
+          // Si les données sont nulles, on retourne tel quel afin d'éviter des erreurs de types "Cannot read property of null"
           return olympics;
         }
 
-        // Une fois les données disponibles, on recherche le pays correspondant.
         return olympics.find((olympic) => olympic.id === id);
       })
     );
@@ -92,20 +99,19 @@ export class OlympicService
   }> 
   {
     return this.getOlympics().pipe(
-      map((olympics) => {
-        // Si les données sont nulles ou non disponibles, retourner un modèle vide
+    map((olympics) => {
         if (!olympics) {
           return {
-            countriesCount: 0, // Aucun pays
-            olympicsCount: 0, // Aucune participation
-            chartData: { labels: [], datasets: [] }, // Pas de données pour le graphique
+            countriesCount: 0,
+            olympicsCount: 0,
+            chartData: { labels: [], datasets: [] },
           };
         }
 
-        // Calculer le nombre total de pays participants
+        // pays participants
         const countriesCount = olympics.length;
 
-        // Calculer le nombre total de participations aux Jeux Olympiques
+        // participations aux Jeux Olympiques
         const olympicsCount = olympics.reduce(
           (total, country) => total + country.participations.length,
           0
@@ -124,20 +130,20 @@ export class OlympicService
 
         // Retourner les données formatées pour le graphique
         return {
-          countriesCount, // Nombre de pays participants
-          olympicsCount, // Nombre total de participations
+          countriesCount,
+          olympicsCount,
           chartData: {
-            labels: chartLabels, // Labels pour le graphique (noms des pays)
+            labels: chartLabels,
             datasets: [
               {
-                data: chartData, // Données pour le graphique (nombre de médailles)
+                data: chartData, // (nombre de médailles)
                 backgroundColor: chartLabels.map(() =>
-                  // Générer une couleur aléatoire pour chaque segment
+                  // Générer une couleur aléatoire pour chaque segment (origine = différents bleus = pas terrible)
                   '#' + Math.floor(Math.random() * 16777215).toString(16)
                 ),
-                borderColor: '#ffffff', // Couleur de la bordure des segments
-                borderWidth: 2, // Épaisseur de la bordure
-                hoverOffset: 0, // CORRECTION : Désactiver le grossissement au survol
+                borderWidth: 0, // Pas de bordure
+                borderColor: '#ffffff',
+                hoverOffset: 0, // Désactiver le grossissement au survol
               },
             ],
           },
@@ -202,10 +208,10 @@ export class OlympicService
           datasets: [
             {
               data: participations.map((participation) => participation.medalsCount),
-              label: 'Médailles',
+              label: 'Dates',
               borderColor: '#2563EB',
               pointRadius: 0,
-              tension: 0, // CORRECTION : Mettre à 0 pour avoir des lignes droites
+              tension: 0, //Mettre à 0 pour avoir des lignes droites
               fill: false,
             },
           ],
@@ -238,6 +244,7 @@ export class OlympicService
 
 }
 
+// Modèles spécifiques au service (pour éviter les dépendances circulaires)
 interface OlympicParticipation {
   id: number;
   year: number;
@@ -246,6 +253,7 @@ interface OlympicParticipation {
   athleteCount: number;
 }
 
+// Représente un pays participant aux Jeux Olympiques avec ses participations
 export interface OlympicCountry {
   id: number;
   country: string;
