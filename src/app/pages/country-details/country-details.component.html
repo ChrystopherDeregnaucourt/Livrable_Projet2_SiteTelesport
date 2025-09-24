@@ -1,0 +1,66 @@
+@if (viewModel$ | async; as view) {
+  <section class="dashboard">
+    @switch (view.status) {
+      @case ('loading') {
+        <p class="state-message" aria-live="polite">
+          Loading country data...
+        </p>
+      }
+
+      @case ('error') {
+        <p class="state-message state-message--error" role="alert">
+          We were unable to load the information for this country. Please try again
+          later.
+        </p>
+      }
+
+      @case ('not-found') {
+        <div class="state-message">
+          <p class="state-message__title">Country not found</p>
+          <p class="state-message__body">
+            The requested country does not exist in our records.
+          </p>
+          <a class="link" routerLink="/">Back to dashboard</a>
+        </div>
+      }
+
+      @case ('ready') {
+          <div class="details__top-bar">
+            <button type="button" class="back-button" routerLink="/">
+              ← Back
+            </button>
+          </div>
+
+          <header class="dashboard__header">
+            <div>
+            <h1 class="page-title">{{ view.countryName }}</h1>
+          </div>
+            <div class="dashboard__stats">
+              <div class="stat-card">
+                <span class="stat-card__label">Number of entries</span>
+                <span class="stat-card__value">{{ view.metrics.entries }}</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-card__label">Total number medals</span>
+                <span class="stat-card__value">{{ view.metrics.medals }}</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-card__label">Total number of athletes</span>
+                <span class="stat-card__value">{{ view.metrics.athletes }}</span>
+              </div>
+            </div>
+          </header>
+
+          <div class="details__chart">
+            <canvas
+              baseChart
+              [type]="'line'"
+              [data]="view.chartData"
+              [options]="lineChartOptions"
+            ></canvas>
+          </div>
+      }
+    }
+  </section>
+}
+

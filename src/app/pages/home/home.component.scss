@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  min-height: 100%;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: linear-gradient(135deg, #f4f7ff 0%, #ffffff 60%);
+  color: #1f2937;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.loading {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 1.05rem;
+  color: #475569;
+}
+
+@media (max-width: 720px) {
+  .chart-card {
+    width: 100%;
+  }
+
+  .chart-card__canvas {
+    min-height: clamp(240px, 65vw, 320px);
+  }
+}

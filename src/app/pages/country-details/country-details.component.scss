@@ -1,0 +1,99 @@
+:host {
+  display: block;
+  min-height: 100%;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  background: linear-gradient(135deg, #f4f7ff 0%, #ffffff 60%);
+  color: #1f2937;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.details__top-bar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.back-button {
+  appearance: none;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover,
+.back-button:focus-visible {
+  background-color: rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+// Override des styles globaux pour dashboard__stats sur cette page
+.dashboard__stats {
+  gap: 1.5rem !important; // Réduire l'espacement entre les cartes
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.details__chart {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  min-width: 200px;
+  min-height: 500px;
+}
+
+.state-message {
+  max-width: 720px;
+  margin: 4rem auto 0;
+  padding: 1.5rem 2rem;
+  border-radius: 18px;
+  background: #f1f5f9;
+  color: #0f172a;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.state-message--error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.state-message__title {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.state-message__body {
+  margin: 0 0 1rem;
+  color: #475569;
+}
+
+.link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover,
+.link:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  :host {
+    padding: 3rem;
+  }
+}
+
+

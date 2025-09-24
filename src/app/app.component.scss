@@ -1,0 +1,112 @@
+/* Styles partagés pour les titres des sections */
+.page-title {
+  margin: 0;
+  padding: 0.5rem 1.25rem;
+  font-size: clamp(1.5rem, 2.3vw, 2.25rem);
+  text-align: center;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #04838f;
+  border-radius: 0.75rem;
+  width: fit-content;
+}
+
+/* Styles partagés pour les cartes */
+.stat-card {
+  min-width: 180px;
+  padding: 1.25rem 1.75rem;
+  border-radius: 1.25rem;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: center;
+  border: 2px solid #04838f;
+}
+
+.stat-card__label {
+  font-size: 1.25rem;
+  letter-spacing: 0.12em;
+  color: #64748b;
+}
+
+.stat-card__value {
+  font-size: 2rem;
+  font-weight: 400;
+  color: #0f172a;
+}
+
+/* Styles pour les métriques (utilisées dans country-details) */
+.metric {
+  background: white;
+  border-radius: 18px;
+  border-color: #04838f;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 2px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content;
+  min-width: 140px;
+}
+
+.dashboard__header {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(1.5rem, 2vw, 2.5rem);
+}
+
+.dashboard__stats {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rem;
+  
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 2.5vw, 2.5rem);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.metric__label {
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.metric__value {
+  font-size: clamp(1.8rem, 1rem + 1.5vw, 2.5rem);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Media queries pour les cartes */
+@media (max-width: 720px) {
+  .stat-card {
+    width: 70%;
+    min-width: unset;
+    text-align: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .dashboard__stats {
+    gap: 1rem !important; // Encore plus petit espacement sur mobile
+    flex-direction: column; // Empiler verticalement sur très petits écrans si nécessaire
+  }
+}

@@ -1,3 +1,37 @@
-<h2>Olympic games app</h2>
-<hr />
-<p>{{ (olympics$ | async)?.length }} data loaded</p>
+@if (viewModel$ | async; as view)
+{
+  <section class="dashboard">
+    <header class="dashboard__header">
+      <div>
+        <h1 class="page-title">Medals per Country</h1>
+      </div>
+      <div class="dashboard__stats">
+        <div class="stat-card">
+          <span class="stat-card__label">Number of JOs</span>
+          <span class="stat-card__value">{{ view.olympicsCount }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">Number of countries</span>
+          <span class="stat-card__value">{{ view.countriesCount }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div >
+      <div >
+        <div >
+          <canvas
+            baseChart
+            [data]="view.chartData"
+            type="pie"
+            [options]="pieChartOptions"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+@else
+{
+  <div class="loading">Loading olympic data…</div>
+}
