@@ -45,7 +45,7 @@ export class CountryDetailsComponent implements OnInit
   public lineChartOptions: ChartConfiguration<'line'>['options'] = 
   {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     layout: {
       padding: {
         top: 20,
@@ -63,7 +63,7 @@ export class CountryDetailsComponent implements OnInit
           boxWidth: 0, // On affiche pas les boîtes de couleur
           boxHeight: 0,
           font: {
-            size: 30, 
+            size: 25, 
             family: 'Montserrat, sans-serif'
           },
           color: '#898f9bff'
