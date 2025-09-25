@@ -97,16 +97,38 @@
 
 /* Media queries pour les cartes */
 @media (max-width: 720px) {
+ .dashboard__stats {   
+    gap: 1rem !important;
+  }
+
   .stat-card {
     width: 70%;
+    padding: 0.85rem 1.25rem;
     min-width: unset;
     text-align: center;
   }
 }
 
-@media (max-width: 767px) {
-  .dashboard__stats {
-    gap: 1rem !important; // Encore plus petit espacement sur mobile
-    flex-direction: column; // Empiler verticalement sur très petits écrans si nécessaire
+
+@media (max-width: 600px) 
+{
+  .dashboard__stats {   
+    gap: 1rem !important;
   }
-}
+
+  .stat-card {
+    width: min(100%, 260px);
+    padding: 0.85rem 1.25rem;
+    border-radius: 1rem;
+  }
+
+    .stat-card__label {
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-card__value {
+      font-size: 1.6rem;
+      font-weight: 500;
+    }
+  }
